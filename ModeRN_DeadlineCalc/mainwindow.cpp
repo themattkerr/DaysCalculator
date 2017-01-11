@@ -6,6 +6,10 @@
 #include <QString>
 #include <QStringList>
 #include <QDebug>
+#include <QFile>
+#include <qfiledialog.h>
+#include <QDataStream>
+#include <QMessageBox>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -24,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+     delete ui;
 }
 
 
@@ -112,9 +116,18 @@ void MainWindow::on_financing_dateEdit_dateChanged(const QDate &date)
     refreshfields();
 }
 
+
+
 void MainWindow::refreshfields()
 {
+    saveCheckBoxes();
     calculateDays();
+
+
+    ui->lineEdit_Address->setText(m_strPropertyAddress );
+    ui->lineEdit_Earnest_Money_Amount->setText(m_strEarnestMoneyAmount);
+    ui->lineEdit_Listing_Trust->setText(m_strListingFirmTrustName);
+
 
     ui->dateEdit_AcceptedOffer->setDate(m_dtAcceptedOffer);
 
@@ -185,6 +198,10 @@ void MainWindow::setDefaults()
         for(int zzz = 0;zzz < MAX_NUM_CONTINGENCIES;zzz++)
             m_sContingencySorting[zzz] = sTemp;
 
+        m_strPropertyAddress = "";
+        m_strListingFirmTrustName = "";
+        m_strEarnestMoneyAmount = "$ ";
+
         m_dtClosingDate = m_dtAcceptedOffer.addDays(nDefaultDaysToClosing);
         m_dtEarnestMoney_date = m_dtAcceptedOffer.addDays(nDefaultDaysEarnestDays);
         m_dtInspection_date = m_dtAcceptedOffer.addDays(nDefaultDaysForInspection);
@@ -202,6 +219,8 @@ void MainWindow::setDefaults()
         ui->comboBox_Custom3->setCurrentText(BLANK);
         ui->comboBox_Custom4->setCurrentText(BLANK);
 
+        ui->lineEdit_Custom5->setText("");
+
         ui->checkBox_1->setChecked(false);
         ui->checkBox_2->setChecked(false);
         ui->checkBox_3->setChecked(false);
@@ -209,7 +228,6 @@ void MainWindow::setDefaults()
         ui->checkBox_5->setChecked(false);
 
         calculateDays();
-        //hideMoreInfo();
         refreshfields();
 }
 
@@ -225,45 +243,40 @@ void MainWindow::calculateDays()
         m_nDaysCustom1 = m_dtAcceptedOffer.daysTo(m_dtCustom1);
     else
     {
-        m_nDaysCustom1 = ui->spinBox_DaysCust1->value();
+        //m_nDaysCustom1 = ui->spinBox_DaysCust1->value();
         m_dtCustom1 = m_dtClosingDate.addDays(m_nDaysCustom1);
-        //calculateDates();
     }
 
     if(!(ui->checkBox_2->isChecked()))
         m_nDaysCustom2 = m_dtAcceptedOffer.daysTo(m_dtCustom2);
     else
     {
-        m_nDaysCustom2 = ui->spinBox_DaysCust2->value();
+        //m_nDaysCustom2 = ui->spinBox_DaysCust2->value();
         m_dtCustom2 = m_dtClosingDate.addDays(m_nDaysCustom2);
-        //calculateDates();
     }
 
     if(!(ui->checkBox_3->isChecked()))
         m_nDaysCustom3 = m_dtAcceptedOffer.daysTo(m_dtCustom3);
     else
     {
-        m_nDaysCustom3 = ui->spinBox_DaysCust3->value();
+        //m_nDaysCustom3 = ui->spinBox_DaysCust3->value();
         m_dtCustom3 = m_dtClosingDate.addDays(m_nDaysCustom3);
-        //calculateDates();
     }
 
     if(!(ui->checkBox_4->isChecked()))
         m_nDaysCustom4 = m_dtAcceptedOffer.daysTo(m_dtCustom4);
     else
     {
-        m_nDaysCustom4 = ui->spinBox_DaysCust4->value();
+        //m_nDaysCustom4 = ui->spinBox_DaysCust4->value();
         m_dtCustom4 = m_dtClosingDate.addDays(m_nDaysCustom4);
-        //calculateDates();
     }
 
     if(!(ui->checkBox_5->isChecked()))
         m_nDaysCustom5 = m_dtAcceptedOffer.daysTo(m_dtCustom5);
     else
     {
-        m_nDaysCustom5 = ui->spinBox_DaysCust5->value();
+        //m_nDaysCustom5 = ui->spinBox_DaysCust5->value();
         m_dtCustom5 = m_dtClosingDate.addDays(m_nDaysCustom5);
-        //calculateDates();
     }
 
 }
@@ -437,6 +450,7 @@ void MainWindow::on_checkBox_1_clicked()
 
 void MainWindow::on_spinBox_DaysCust1_valueChanged(int arg1)
 {
+    m_nDaysCustom1 = arg1;
     if(ui->checkBox_1->isChecked())
         m_dtCustom1 = m_dtClosingDate.addDays(arg1);
     else  m_dtCustom1 = m_dtAcceptedOffer.addDays(arg1);
@@ -465,6 +479,7 @@ void MainWindow::on_checkBox_2_clicked()
 
 void MainWindow::on_spinBox_DaysCust2_valueChanged(int arg1)
 {
+    m_nDaysCustom2 = arg1;
     if(ui->checkBox_2->isChecked())
         m_dtCustom2 = m_dtClosingDate.addDays(arg1);
     else  m_dtCustom2 = m_dtAcceptedOffer.addDays(arg1);
@@ -492,6 +507,7 @@ void MainWindow::on_checkBox_3_clicked()
 
 void MainWindow::on_spinBox_DaysCust3_valueChanged(int arg1)
 {
+    m_nDaysCustom3 = arg1;
     if(ui->checkBox_3->isChecked())
         m_dtCustom3 = m_dtClosingDate.addDays(arg1);
     else  m_dtCustom3 = m_dtAcceptedOffer.addDays(arg1);
@@ -518,6 +534,7 @@ void MainWindow::on_checkBox_4_clicked()
 
 void MainWindow::on_spinBox_DaysCust4_valueChanged(int arg1)
 {
+    m_nDaysCustom4 = arg1;
     if(ui->checkBox_4->isChecked())
         m_dtCustom4 = m_dtClosingDate.addDays(arg1);
     else  m_dtCustom4 = m_dtAcceptedOffer.addDays(arg1);
@@ -532,6 +549,7 @@ void MainWindow::on_custom4_dateEdit_dateChanged(const QDate &date)
 
 void MainWindow::on_checkBox_5_clicked()
 {
+
     if(ui->checkBox_5->isChecked())
     {}//ui->checkBox_5->setText(FROM_CLOSING_MESSAGE);
     else
@@ -544,6 +562,7 @@ void MainWindow::on_checkBox_5_clicked()
 
 void MainWindow::on_spinBox_DaysCust5_valueChanged(int arg1)
 {
+    m_nDaysCustom5 = arg1;
     if(ui->checkBox_5->isChecked())
         m_dtCustom5 = m_dtClosingDate.addDays(arg1);
     else  m_dtCustom5 = m_dtAcceptedOffer.addDays(arg1);
@@ -568,35 +587,39 @@ void MainWindow::on_pushButton_Generat_Report_clicked()
     QString strContingencyReport;
     m_nNumOfContingencies = 5;
 
+    strHeadings.append("Offer milestones:\t").append(m_strPropertyAddress).append("\n");
 
-    strHeadings.append("Date of the Accepted Offer:\t\t").append(m_dtAcceptedOffer.toString(LONG_DATE_FORMAT) ).append("\n");
+    strHeadings.append("Date of the accepted offer:\t\t").append(m_dtAcceptedOffer.toString(LONG_DATE_FORMAT) ).append("\n");
     strHeadings.append("Date of the closing is currently:\t").append(m_dtClosingDate.toString(LONG_DATE_FORMAT) ).append("\n\n");
 
-    strContingencyReport.append("The Closing\n").append(m_dtClosingDate.toString(LONG_DATE_FORMAT)).append("\n").append(CLOSING).append("\n\n");
+    strContingencyReport.append("Closing\n").append(m_dtClosingDate.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysToClosing)).append(" days from acceptance)").append("\n").append(CLOSING).append("\n\n");
     m_sContingencySorting[1].strReportInfo = strContingencyReport;
     m_sContingencySorting[1].dtOfContingency = m_dtClosingDate;
     strContingencyReport.clear();
 
-   m_sContingencySorting[2].strReportInfo = strContingencyReport.append("Earnest Money\nDue: ").append(m_dtEarnestMoney_date.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysForEarnestMoney)).append(" days from acceptance.)").append("\n").append(EARNEST_MONEY).append("\n\n");
+   m_sContingencySorting[2].strReportInfo = strContingencyReport.append("Earnest Money\nDue: ")
+           .append(m_dtEarnestMoney_date.toString(LONG_DATE_FORMAT))
+           .append(" (").append(QString::number(m_nDaysForEarnestMoney))
+           .append(" days from acceptance)").append("\n").append(EARNEST_MONEY1).append(m_strListingFirmTrustName).append(EARNEST_MONEY2).append(m_strEarnestMoneyAmount ).append(EARNEST_MONEY3).append("\n\n");
    m_sContingencySorting[2].dtOfContingency = m_dtEarnestMoney_date;
    strContingencyReport.clear();
 
-   m_sContingencySorting[3].strReportInfo = strContingencyReport.append("The Inspection Contingency\n").append(m_dtInspection_date.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysForInspection)).append(" days from acceptance.)").append("\n").append(INSPECTION).append("\n\n");
+   m_sContingencySorting[3].strReportInfo = strContingencyReport.append("Inspection Contingency\nDue: ").append(m_dtInspection_date.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysForInspection)).append(" days from acceptance)").append("\n").append(INSPECTION).append("\n\n");
    m_sContingencySorting[3].dtOfContingency = m_dtInspection_date;
    strContingencyReport.clear();
 
-   m_sContingencySorting[4].strReportInfo = strContingencyReport.append("The Appraisal Contingency\n").append(m_dtAppraisal_date.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysForAppraisal)).append(" days from acceptance.)").append("\n").append(APPRAISAL).append("\n\n");
+   m_sContingencySorting[4].strReportInfo = strContingencyReport.append("Appraisal Contingency\nDue: ").append(m_dtAppraisal_date.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysForAppraisal)).append(" days from acceptance)").append("\n").append(APPRAISAL).append("\n\n");
    m_sContingencySorting[4].dtOfContingency = m_dtAppraisal_date;
    strContingencyReport.clear();
 
-   m_sContingencySorting[5].strReportInfo = strContingencyReport.append("The Financing Contingency\n").append(m_dtFinancing_date.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysForFinaincing)).append(" days from acceptance.)").append("\n").append(APPRAISAL).append("\n\n");
+   m_sContingencySorting[5].strReportInfo = strContingencyReport.append("Financing Contingency\nDue: ").append(m_dtFinancing_date.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysForFinaincing)).append(" days from acceptance)").append("\n").append(FINANCING).append("\n\n");
    m_sContingencySorting[5].dtOfContingency = m_dtFinancing_date;
    strContingencyReport.clear();
 
    if((ui->comboBox_Custom1->currentText()) != BLANK )
     {
        m_nNumOfContingencies++;
-       strContingencyReport.append(ui->comboBox_Custom1->currentText()).append("\n").append(m_dtCustom1.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom1));
+       strContingencyReport.append(ui->comboBox_Custom1->currentText()).append("\nDue: ").append(m_dtCustom1.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom1));
         if(ui->checkBox_1->isChecked())
             strContingencyReport.append(" days from closing)");
         else
@@ -613,7 +636,7 @@ void MainWindow::on_pushButton_Generat_Report_clicked()
     if((ui->comboBox_Custom2->currentText()) != BLANK )
     {
         m_nNumOfContingencies++;
-        strContingencyReport.append(ui->comboBox_Custom2->currentText()).append("\n").append(m_dtCustom2.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom2));
+        strContingencyReport.append(ui->comboBox_Custom2->currentText()).append("\nDue: ").append(m_dtCustom2.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom2));
         if(ui->checkBox_2->isChecked())
             strContingencyReport.append(" days from closing)");
         else
@@ -629,7 +652,7 @@ void MainWindow::on_pushButton_Generat_Report_clicked()
     if((ui->comboBox_Custom3->currentText()) != BLANK )
     {
         m_nNumOfContingencies++;
-        strContingencyReport.append(ui->comboBox_Custom3->currentText()).append("\n").append(m_dtCustom3.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom3));
+        strContingencyReport.append(ui->comboBox_Custom3->currentText()).append("\nDue: ").append(m_dtCustom3.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom3));
         if(ui->checkBox_3->isChecked())
             strContingencyReport.append(" days from closing)");
         else
@@ -644,7 +667,7 @@ void MainWindow::on_pushButton_Generat_Report_clicked()
     if((ui->comboBox_Custom4->currentText()) != BLANK )
     {
         m_nNumOfContingencies++;
-        strContingencyReport.append(ui->comboBox_Custom4->currentText()).append("\n").append(m_dtCustom4.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom4));
+        strContingencyReport.append(ui->comboBox_Custom4->currentText()).append("\nDue: ").append(m_dtCustom4.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom4));
         if(ui->checkBox_4->isChecked())
             strContingencyReport.append(" days from closing)");
         else
@@ -658,7 +681,7 @@ void MainWindow::on_pushButton_Generat_Report_clicked()
     if(ui->lineEdit_Custom5->text() != "")
     {
         m_nNumOfContingencies++;
-        strContingencyReport.append(ui->lineEdit_Custom5->text()).append("\n").append(m_dtCustom5.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom5));
+        strContingencyReport.append(ui->lineEdit_Custom5->text()).append("\nDue: ").append(m_dtCustom5.toString(LONG_DATE_FORMAT)).append(" (").append(QString::number(m_nDaysCustom5));
         if(ui->checkBox_5->isChecked())
             strContingencyReport.append(" days from closing)");
         else
@@ -734,6 +757,8 @@ QString MainWindow::getContingencyText(QString comboText)
         return ZONING;
     if(comboText == "Survey")
         return SURVEY;
+    if(comboText == "Loan Rate Lock Expiration")
+        return RATE_LOCK;
 return "Error";
 }
 void MainWindow::setupCustomComboBoxes()
@@ -742,7 +767,7 @@ void MainWindow::setupCustomComboBoxes()
     strlCustomItems << "-" << "Final Walk-through" << "Radon Test" << "Condo Docs" <<
                        "Well & Septic" << "Comfort Letter" << "Environmental Test" <<
                        "Attorney Review" << "Home-owner inssurence" << "Condition Report" <<
-                       "Sewer" << "Zoning" << "Survey" ;
+                       "Sewer" << "Zoning" << "Survey" << "Loan Rate Lock Expiration";
 
     ui->comboBox_Custom1->addItems(strlCustomItems);
     ui->comboBox_Custom2->addItems(strlCustomItems);
@@ -758,4 +783,214 @@ QString MainWindow::getOrderedContingencies()
         strTemp.append(m_sContingencySorting[iii].strReportInfo );
 
     return strTemp;
+}
+
+void MainWindow::on_actionSave_File_triggered()
+{
+    bool ok;
+    QMessageBox SaveStatus;
+    m_strFileName =  QFileDialog::getSaveFileName(this, tr("Save as Contingency File"),  "" ,tr("Contingencyu (*.MDRN)"));
+    ok = saveAsContingencyFile();
+    if(ok)
+    {
+        SaveStatus.setText("Save Successful!");
+
+    }
+    else
+    {
+        SaveStatus.setText("Save Fail!!!");
+
+    }
+    SaveStatus.exec();
+}
+
+bool MainWindow::saveAsContingencyFile()
+
+    {
+        QFile file (m_strFileName);
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate))
+        {
+            QDataStream stream (&file);
+
+
+            stream << QString (CURRENT_VERSION);
+            stream << m_strPropertyAddress;
+            stream << m_strListingFirmTrustName;
+            stream << m_strEarnestMoneyAmount;
+            stream << m_nNumOfContingencies;
+            stream << m_dtAcceptedOffer
+                   << m_dtClosingDate
+                   << m_dtEarnestMoney_date
+                   << m_dtInspection_date
+                   << m_dtAppraisal_date
+                   << m_dtFinancing_date
+                   << m_dtCustom1
+                   << m_dtCustom2
+                   << m_dtCustom3
+                   << m_dtCustom4
+                   << m_dtCustom5;
+            stream << m_nDaysToClosing
+                << m_nDaysForEarnestMoney
+                << m_nDaysForInspection
+                << m_nDaysForAppraisal
+                << m_nDaysForFinaincing
+                << m_nDaysCustom1
+                << m_nDaysCustom2
+                << m_nDaysCustom3
+                << m_nDaysCustom4
+                << m_nDaysCustom5;
+            stream
+                <<  m_bCust1FromClosing
+                <<  m_bCust2FromClosing
+                <<  m_bCust3FromClosing
+                <<  m_bCust4FromClosing
+                <<  m_bCust5FromClosing;
+            stream
+                << ui->comboBox_Custom1->currentText()
+                << ui->comboBox_Custom2->currentText()
+                << ui->comboBox_Custom3->currentText()
+                << ui->comboBox_Custom4->currentText();
+            stream
+                << ui->lineEdit_Custom5->text();
+
+
+
+           file.flush();
+           file.close();
+           return true;
+        }
+       else
+            return false;
+
+}
+
+void MainWindow::on_actionOpen_File_triggered()
+{
+    bool ok;
+    QMessageBox openStatus;
+    m_strFileName = QFileDialog::getOpenFileName(this, tr("Select a file"), "Files", tr("Contingency File (*.MDRN)") );
+    ok = readContingencyFile();
+    if(ok)
+    {
+        openStatus.setText("Open Successful!");
+    }
+    else
+    {
+        openStatus.setText("Open Failed!!!");
+    }
+    openStatus.exec();
+    //setDayFieldsToMembers();
+    refreshfields();
+
+
+}
+bool MainWindow::readContingencyFile()
+{
+
+    QFile file (m_strFileName);
+    file.open(QIODevice::ReadOnly);
+
+        QDataStream stream (&file);
+
+       stream >> m_strVerNum;
+
+       if(m_strVerNum == "1.2.0")
+       {
+           stream >> m_strPropertyAddress;
+           stream >> m_strListingFirmTrustName;
+           stream >> m_strEarnestMoneyAmount;
+           stream >> m_nNumOfContingencies;
+
+           stream >> m_dtAcceptedOffer
+                  >> m_dtClosingDate
+                  >> m_dtEarnestMoney_date
+                  >> m_dtInspection_date
+                  >> m_dtAppraisal_date
+                  >> m_dtFinancing_date
+                  >> m_dtCustom1
+                  >> m_dtCustom2
+                  >> m_dtCustom3
+                  >> m_dtCustom4
+                  >> m_dtCustom5;
+
+           stream
+               >> m_nDaysToClosing
+               >> m_nDaysForEarnestMoney
+               >> m_nDaysForInspection
+               >> m_nDaysForAppraisal
+               >> m_nDaysForFinaincing
+               >> m_nDaysCustom1
+               >> m_nDaysCustom2
+               >> m_nDaysCustom3
+               >> m_nDaysCustom4
+               >> m_nDaysCustom5;
+           stream
+               >>  m_bCust1FromClosing
+               >>  m_bCust2FromClosing
+               >>  m_bCust3FromClosing
+               >>  m_bCust4FromClosing
+               >>  m_bCust5FromClosing;
+
+           QString A,B,C,D,E;
+           stream
+               >> A >> B >> C >> D >> E;
+            ui->comboBox_Custom1->setCurrentIndex (ui->comboBox_Custom1->findText (A));
+            ui->comboBox_Custom2->setCurrentIndex (ui->comboBox_Custom2->findText (B));
+            ui->comboBox_Custom3->setCurrentIndex (ui->comboBox_Custom3->findText (C));
+            ui->comboBox_Custom4->setCurrentIndex (ui->comboBox_Custom4->findText (D));
+            ui->lineEdit_Custom5->setText(E);
+
+
+           setCheckBoxes();
+           file.close();
+           return true;
+        }
+    return false;
+
+}
+void MainWindow::setCheckBoxes()
+{
+    ui->checkBox_1->setChecked(m_bCust1FromClosing);
+    ui->checkBox_2->setChecked(m_bCust2FromClosing);
+    ui->checkBox_3->setChecked(m_bCust3FromClosing);
+    ui->checkBox_4->setChecked(m_bCust4FromClosing);
+    ui->checkBox_5->setChecked(m_bCust5FromClosing);
+}
+
+void MainWindow::saveCheckBoxes()
+{
+    m_bCust1FromClosing = ui->checkBox_1->isChecked();
+    m_bCust2FromClosing = ui->checkBox_2->isChecked();
+    m_bCust3FromClosing = ui->checkBox_3->isChecked();
+    m_bCust4FromClosing = ui->checkBox_4->isChecked();
+    m_bCust5FromClosing = ui->checkBox_5->isChecked();
+}
+
+/*void MainWindow::setDayFieldsToMembers()
+{
+
+
+}*/
+
+void MainWindow::on_lineEdit_Address_editingFinished()
+{
+    m_strPropertyAddress = ui->lineEdit_Address->text();
+    refreshfields();
+}
+
+void MainWindow::on_lineEdit_Earnest_Money_Amount_editingFinished()
+{
+    m_strEarnestMoneyAmount = ui->lineEdit_Earnest_Money_Amount->text();
+    refreshfields();
+}
+
+void MainWindow::on_lineEdit_Listing_Trust_editingFinished()
+{
+    m_strListingFirmTrustName = ui->lineEdit_Listing_Trust->text();
+    refreshfields();
+}
+
+void MainWindow::on_spinBox_DaysCust1_valueChanged(const QString &arg1)
+{
+
 }

@@ -25,11 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    reportoutput.cpp
+    reportoutput.cpp \
+    contingencydata.cpp
 
 HEADERS  += mainwindow.h \
     reportoutput.h \
-    textforcontingencies.h
+    textforcontingencies.h \
+    contingencydata.h
 
 FORMS    += mainwindow.ui \
     reportoutput.ui
