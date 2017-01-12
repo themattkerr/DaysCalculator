@@ -28,7 +28,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-     delete ui;
+    if(m_bUnsavedData)
+    {
+        QMessageBox UnsavedWarning;
+        UnsavedWarning.setText("Warning!!! There is unsaved data present!");
+        UnsavedWarning.exec();
+        on_actionSave_File_triggered();
+    }
+    delete ui;
+
 }
 
 
@@ -39,6 +47,7 @@ void MainWindow::on_calendarWidget_clicked(const QDate &date)
     m_dtAcceptedOffer = date;
     refreshfields();
 
+
 }
 
 void MainWindow::on_dateEdit_AcceptedOffer_userDateChanged(const QDate &date)
@@ -47,8 +56,8 @@ void MainWindow::on_dateEdit_AcceptedOffer_userDateChanged(const QDate &date)
     m_dtAcceptedOffer = date;
     calculateDates();
     calculateDays();
-
     refreshfields();
+
 
 }
 
@@ -63,6 +72,7 @@ void MainWindow::on_dateEdit_CalculatedDate_dateChanged(const QDate &date)
 {
     m_dtClosingDate = date;
     refreshfields();
+
 }
 
 
@@ -71,17 +81,20 @@ void MainWindow::on_daysForEarnestMoney_spinBox_valueChanged(int arg1)
 {
     m_dtEarnestMoney_date = m_dtAcceptedOffer.addDays(arg1);
     refreshfields();
+
 }
 void MainWindow::on_daysForInspection_spinBox_valueChanged(int arg1)
 {
     m_dtInspection_date = m_dtAcceptedOffer.addDays(arg1);
     refreshfields();
+
 }
 
 void MainWindow::on_earnestMoney_dateEdit_dateChanged(const QDate &date)
 {
     m_dtEarnestMoney_date = date;
     refreshfields();
+
 }
 
 
@@ -90,6 +103,7 @@ void MainWindow::on_inspection_dateEdit_dateChanged(const QDate &date)
 {
     m_dtInspection_date = date;
     refreshfields();
+
 }
 
 void MainWindow::on_daysForAppraisal_spinBox_valueChanged(int arg1)
@@ -120,6 +134,7 @@ void MainWindow::on_financing_dateEdit_dateChanged(const QDate &date)
 
 void MainWindow::refreshfields()
 {
+    unsavedDataPresent ();
     saveCheckBoxes();
     calculateDays();
 
@@ -181,6 +196,7 @@ void MainWindow::refreshfields()
 void MainWindow::setDefaults()
 {
 
+    m_bUnsavedData = false;
     m_dtAcceptedOffer = QDate::currentDate();
 
         int nDefaultDaysToClosing = 60;
@@ -794,11 +810,11 @@ void MainWindow::on_actionSave_File_triggered()
     if(ok)
     {
         SaveStatus.setText("Save Successful!");
-
+        noUnsavedDataPresent();
     }
     else
     {
-        SaveStatus.setText("Save Fail!!!");
+        SaveStatus.setText("File NOT saved.");
 
     }
     SaveStatus.exec();
@@ -873,6 +889,8 @@ void MainWindow::on_actionOpen_File_triggered()
     if(ok)
     {
         openStatus.setText("Open Successful!");
+        refreshfields();
+        noUnsavedDataPresent();
     }
     else
     {
@@ -880,7 +898,7 @@ void MainWindow::on_actionOpen_File_triggered()
     }
     openStatus.exec();
     //setDayFieldsToMembers();
-    refreshfields();
+
 
 
 }
@@ -993,4 +1011,12 @@ void MainWindow::on_lineEdit_Listing_Trust_editingFinished()
 void MainWindow::on_spinBox_DaysCust1_valueChanged(const QString &arg1)
 {
 
+}
+void MainWindow::unsavedDataPresent()
+{
+    m_bUnsavedData = true;
+}
+void MainWindow::noUnsavedDataPresent()
+{
+    m_bUnsavedData = false;
 }

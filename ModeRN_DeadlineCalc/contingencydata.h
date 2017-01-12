@@ -12,6 +12,18 @@ enum CalculateFrom {
     CALC_FROM_CLOSING   = 2,
 
 };
+class Contingencies{
+public:
+    Contingencies();
+    ~Contingencies();
+private:
+    QDate m_dtDateOfContingency;
+    QTime m_tTimeOfDay;
+    QString m_strReportInfo;
+
+    int m_nCalcType;
+};
+
 
 class ContingencyData
 {
@@ -29,6 +41,8 @@ public:
     void enterReportInfo(QString strReportInfo);
     void enterAODate(QDate dtAODate);
     void enterClosingDate(QDate dtClosingDate);
+    void sortContingenciesAcending();
+    void sortContingenciesDecending();
 
     void refreshData();
 
@@ -36,11 +50,7 @@ private:
 
     QDate m_dtAODate;
     QDate m_dtClosingDate;
-    QDate m_dtDateOfContingency;
-    QTime m_tTimeOfDay;
-    QString m_strReportInfo;
 
-    int m_nCalcType;
 
 };
 

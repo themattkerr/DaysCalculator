@@ -6,6 +6,7 @@
 #include <QString>
 #include <QFile>
 #include <QDataStream>
+#include "contingencydata.h"
 
 #define CURRENT_VERSION "1.2.0"
 #define LONG_DATE_FORMAT "ddd MMMM d, yyyy"
@@ -75,17 +76,12 @@ private slots:
     void on_pushButton_Generat_Report_clicked();
 
     void on_comboBox_Custom1_currentIndexChanged(const QString &arg1);
-
     void on_actionSave_File_triggered();
-
     void on_actionOpen_File_triggered();
 
     void on_lineEdit_Address_editingFinished();
-
     void on_lineEdit_Earnest_Money_Amount_editingFinished();
-
     void on_lineEdit_Listing_Trust_editingFinished();
-
     void on_spinBox_DaysCust1_valueChanged(const QString &arg1);
 
 private:
@@ -95,10 +91,11 @@ private:
     QString m_strFileName;
     QString m_strVerNum = CURRENT_VERSION;
 
-    QString m_strPropertyAddress; // <==== These are new
+    QString m_strPropertyAddress;
     QString m_strListingFirmTrustName;
     QString m_strEarnestMoneyAmount;
 
+    bool m_bUnsavedData;
     int m_nNumOfContingencies;
 
     QDate   m_dtAcceptedOffer,
@@ -132,6 +129,8 @@ private:
 
     sData m_sContingencySorting[MAX_NUM_CONTINGENCIES];
 
+    void unsavedDataPresent();
+    void noUnsavedDataPresent();
     void setupCustomComboBoxes();
     void setDefaults();
     void refreshfields();
